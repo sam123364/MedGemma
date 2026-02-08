@@ -1,0 +1,68 @@
+[
+  {
+    "source_id": "E-ADA-2025",
+    "title": "ADA Standards of Care in Diabetes 2025",
+    "summary": "Metformin remains a common first-line therapy when tolerated and renal function is adequate. GLP-1 receptor agonists and SGLT2 inhibitors are prioritized for cardiometabolic risk reduction.",
+    "year": 2025,
+    "source_url": "https://diabetesjournals.org/care",
+    "condition": "type-2-diabetes",
+    "intervention": "metformin, GLP-1RA, SGLT2",
+    "outcome": "HbA1c reduction and cardiometabolic benefit",
+    "risk": "renal thresholds and GI adverse effects"
+  },
+  {
+    "source_id": "E-EASD-2024",
+    "title": "EASD/ADA Consensus Update on Hyperglycemia Management",
+    "summary": "Treatment should be personalized by comorbidity, baseline HbA1c, and patient adherence patterns. Combination therapy can improve control when baseline HbA1c is high.",
+    "year": 2024,
+    "source_url": "https://www.easd.org",
+    "condition": "type-2-diabetes",
+    "intervention": "combination therapy",
+    "outcome": "personalized glycemic control",
+    "risk": "polypharmacy burden"
+  },
+  {
+    "source_id": "E-PUBMED-001",
+    "title": "Semaglutide and Glycemic Outcomes in Type 2 Diabetes",
+    "summary": "Semaglutide improves HbA1c and body weight in adults with type 2 diabetes, with gastrointestinal adverse events as common side effects.",
+    "year": 2023,
+    "source_url": "https://pubmed.ncbi.nlm.nih.gov/36781234/",
+    "condition": "type-2-diabetes",
+    "intervention": "GLP-1RA",
+    "outcome": "HbA1c and weight",
+    "risk": "GI events"
+  },
+  {
+    "source_id": "E-PUBMED-002",
+    "title": "SGLT2 inhibitors and cardio-renal outcomes",
+    "summary": "SGLT2 inhibitors can reduce heart failure hospitalization and slow renal decline in selected populations.",
+    "year": 2024,
+    "source_url": "https://pubmed.ncbi.nlm.nih.gov/39000210/",
+    "condition": "type-2-diabetes",
+    "intervention": "SGLT2",
+    "outcome": "cardio-renal outcomes",
+    "risk": "volume depletion, euglycemic ketoacidosis"
+  },
+  {
+    "source_id": "E-PUBMED-003",
+    "title": "Basal insulin intensification patterns in uncontrolled T2D",
+    "summary": "Basal insulin can rapidly improve glycemia for high baseline HbA1c, but hypoglycemia risk rises when adherence and monitoring are poor.",
+    "year": 2022,
+    "source_url": "https://pubmed.ncbi.nlm.nih.gov/35121018/",
+    "condition": "type-2-diabetes",
+    "intervention": "insulin",
+    "outcome": "short-term glycemic reduction",
+    "risk": "hypoglycemia"
+  },
+  {
+    "source_id": "E-PUBMED-004",
+    "title": "Lifestyle intervention and long-term glycemic response",
+    "summary": "Structured nutrition and exercise interventions improve glycemic trajectories and medication response durability.",
+    "year": 2021,
+    "source_url": "https://pubmed.ncbi.nlm.nih.gov/34000320/",
+    "condition": "type-2-diabetes",
+    "intervention": "lifestyle",
+    "outcome": "HbA1c trajectory",
+    "risk": "adherence drop-off"
+  }
+]

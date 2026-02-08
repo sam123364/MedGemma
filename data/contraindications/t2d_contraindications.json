@@ -1,0 +1,22 @@
+[
+  {
+    "code": "EGFR_METFORMIN_CONTRAINDICATION",
+    "condition": "egfr < 30",
+    "message": "Metformin contraindicated when baseline eGFR is below 30."
+  },
+  {
+    "code": "LOW_EGFR_SGLT2_RISK",
+    "condition": "egfr < 20",
+    "message": "SGLT2 inhibitors require caution at very low eGFR in this prototype rule set."
+  },
+  {
+    "code": "ALT_TZD_RISK",
+    "condition": "alt > 120 and protocol contains pioglitazone",
+    "message": "Elevated ALT with TZD protocol triggers disqualification in this simulation."
+  },
+  {
+    "code": "HYPOGLYCEMIA",
+    "condition": "predicted fasting_glucose < 65",
+    "message": "Hypoglycemia threshold exceeded during trajectory rollout."
+  }
+]

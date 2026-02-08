@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "astra-gemma-backend"
+version = "0.1.0"
+description = "Astra-Gemma backend service for agentic clinical trial simulation"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.116.0",
+  "uvicorn[standard]>=0.35.0",
+  "pydantic>=2.11.0",
+  "python-dotenv>=1.1.0",
+  "httpx>=0.28.0",
+  "numpy>=2.1.0",
+  "chromadb>=1.0.0",
+  "langgraph>=0.4.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.4.0",
+  "pytest-asyncio>=0.24.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+asyncio_mode = "auto"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
