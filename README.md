@@ -2,7 +2,8 @@
 
 Astra-Gemma is an agentic in-silico clinical trial engine for synthetic Type 2 Diabetes patient twins.
 It runs 1,000 coarse simulation trajectories, re-simulates top protocols with MedGemma-guided calibration,
-and returns ranked treatment hypotheses with safety flags, evidence citations, and explainable rationale.
+and returns ranked treatment hypotheses with safety flags, evidence citations, explainable rationale,
+and a population-stability map across nearby synthetic patient variants.
 
 ## Why this project
 
@@ -15,10 +16,10 @@ This project is built for the MedGemma Impact Challenge with explicit alignment 
 
 ## Stack
 
-- Backend: FastAPI + asyncio + SQLite + ChromaDB
-- Agent orchestration: modular multi-agent pipeline (`Researcher`, `Simulator`, `Critic`)
+- Backend: FastAPI + LangGraph + SQLite + ChromaDB
+- Agent orchestration: LangGraph state machine (`Researcher -> Simulator -> Critic`) with per-node checkpoints
 - Model runtime: MedGemma via `mlx` or `ollama` (mock runtime supported for local scaffolding)
-- Frontend: Next.js app router + live SSE dashboard
+- Frontend: Next.js app router + live SSE dashboard + population stability map
 
 ## Quick start
 
@@ -27,6 +28,7 @@ Requires Python 3.11+ (bootstrap prefers Python 3.12 if available).
 ```bash
 ./scripts/bootstrap.sh
 cp backend/.env.example backend/.env
+make migrate
 ./scripts/dev.sh
 ```
 
@@ -61,27 +63,57 @@ MEDGEMMA_RUNTIME=mock
 ## Core APIs
 
 - `POST /api/v1/runs` -> start a run from `PatientTwinInput`
+- `POST /api/v1/runs/{run_id}/resume` -> resume from latest node checkpoint
 - `GET /api/v1/runs/{run_id}/events` -> SSE event stream
 - `GET /api/v1/runs/{run_id}/result` -> final run artifact
+- `GET /api/v1/runs/{run_id}/population-map` -> 27-cell recommendation stability map
 - `POST /api/v1/chat/explain` -> grounded run Q&A
 
 ## Evidence ingestion
 
 Seed evidence is provided in `data/guidelines/t2d_seed_evidence.json`.
-To ingest seed + PubMed-like records into Chroma:
+To ingest and validate a 500-record curated corpus:
 
 ```bash
-source .venv/bin/activate
+source .venv312/bin/activate
 cd backend
-python -m app.rag.ingest_pubmed --seed ../../data/guidelines/t2d_seed_evidence.json --max-records 500
+python -m app.rag.ingest_pubmed --seed ../data/guidelines/t2d_seed_evidence.json --query-file ../data/guidelines/t2d_queries.json --target-count 500
+python -m app.rag.validate_corpus --target-count 500
 ```
+
+Validation report: `output/evidence/evidence_report.json`.
+
+## Benchmarks
+
+```bash
+source .venv312/bin/activate
+cd backend
+MEDGEMMA_RUNTIME=mock ENFORCE_ALEMBIC_HEAD=false python scripts/benchmark_runs.py
+```
+
+Outputs:
+- `output/benchmarks/benchmark_raw.json`
+- `output/benchmarks/benchmark_summary.md`
 
 ## Testing
 
 ```bash
-source .venv/bin/activate
+source .venv312/bin/activate
 cd backend
 pytest
+```
+
+Frontend E2E:
+
+```bash
+cd frontend
+npx playwright test
+```
+
+Deterministic screenshots:
+
+```bash
+./scripts/capture_screenshots.sh
 ```
 
 ## Submission artifacts

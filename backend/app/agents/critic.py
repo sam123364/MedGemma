@@ -1,15 +1,18 @@
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from app.models.schemas import (
     CoarseSummary,
     DailyState,
+    PatientTwinInput,
     ProtocolCandidate,
     ProtocolResult,
     ProtocolScore,
     SafetyFlag,
 )
+from app.safety.comorbidity_policy import assess_protocol_against_profile
 from app.safety.rules_engine import has_disqualifying_flag
 from app.services.medgemma import medgemma_client
 
@@ -19,8 +22,30 @@ def _clamp(value: float, lo: float = 0.0, hi: float = 1.0) -> float:
 
 
 class CriticAgent:
+    @staticmethod
+    def _clean_recommendation_text(text: str) -> str:
+        cleaned = text.strip()
+        if not cleaned:
+            return ""
+
+        # Remove LM Studio/Gemma reasoning artifact blocks.
+        cleaned = re.sub(r"<unused\d+>thought[\s\S]*?<unused\d+>", "", cleaned, flags=re.IGNORECASE)
+        # Remove any remaining pseudo-token tags.
+        cleaned = re.sub(r"</?unused\d+>", "", cleaned, flags=re.IGNORECASE)
+        cleaned = re.sub(r"<[^>\n]+>", "", cleaned)
+
+        cleaned = re.sub(r"\s+", " ", cleaned).strip()
+
+        # Keep the recommendation concise for UI readability.
+        parts = [part.strip() for part in re.split(r"(?<=[.!?])\s+", cleaned) if part.strip()]
+        if len(parts) > 4:
+            cleaned = " ".join(parts[:4]).strip()
+
+        return cleaned
+
     async def evaluate(
         self,
+        patient: PatientTwinInput,
         protocols: list[ProtocolCandidate],
         coarse_by_protocol: dict[str, CoarseSummary],
         trajectories: dict[str, list[DailyState]],
@@ -32,19 +57,20 @@ class CriticAgent:
             coarse = coarse_by_protocol[protocol.protocol_id]
             trajectory = trajectories[protocol.protocol_id]
             flags = flags_by_protocol.get(protocol.protocol_id, [])
+            guideline_assessment = assess_protocol_against_profile(patient, protocol)
 
             first = trajectory[0]
             last = trajectory[-1]
 
             efficacy_gain = max(0.0, first.hba1c_est - last.hba1c_est)
-            efficacy_score = _clamp(efficacy_gain / 2.6)
+            efficacy_score = _clamp((efficacy_gain / 2.6) + guideline_assessment.efficacy_bonus)
 
             high_flags = sum(1 for flag in flags if flag.severity in {"high", "critical"})
             safety_penalty = min(0.85, high_flags * 0.12 + coarse.safety_risk_index * 0.55)
-            safety_score = _clamp(1.0 - safety_penalty)
+            safety_score = _clamp(1.0 - safety_penalty - guideline_assessment.safety_penalty)
 
             mean_adherence = sum(item.adherence_est for item in trajectory) / max(1, len(trajectory))
-            adherence_score = _clamp(mean_adherence)
+            adherence_score = _clamp(mean_adherence - guideline_assessment.adherence_penalty)
 
             robustness_score = _clamp(coarse.robustness_index - coarse.mortality_proxy_rate)
 
@@ -70,7 +96,7 @@ class CriticAgent:
             )
 
             black_box_warning, black_box_code = self._build_black_box_warning(protocol, score, flags)
-            explanation = self._build_explanation(protocol, score, flags)
+            explanation = self._build_explanation(protocol, score, flags, guideline_assessment.rationale)
             results.append(
                 ProtocolResult(
                     protocol=protocol,
@@ -79,6 +105,7 @@ class CriticAgent:
                     flags=flags,
                     score=score,
                     explanation=explanation,
+                    guideline_reasons=guideline_assessment.rationale,
                     black_box_warning=black_box_warning,
                     black_box_code=black_box_code,
                 )
@@ -89,15 +116,23 @@ class CriticAgent:
         return results, final_recommendation
 
     @staticmethod
-    def _build_explanation(protocol: ProtocolCandidate, score: ProtocolScore, flags: list[SafetyFlag]) -> str:
+    def _build_explanation(
+        protocol: ProtocolCandidate,
+        score: ProtocolScore,
+        flags: list[SafetyFlag],
+        guideline_reasons: list[str] | None = None,
+    ) -> str:
         if score.disqualified:
             reason = next((flag.message for flag in flags if flag.disqualifying), "Disqualified by safety rules")
             return f"{protocol.label} was disqualified by the critic due to safety constraints: {reason}."
-        return (
+        explanation = (
             f"{protocol.label} scored {score.total_score:.2f} with efficacy {score.efficacy_score:.2f}, "
             f"safety {score.safety_score:.2f}, adherence {score.adherence_score:.2f}, "
             f"and robustness {score.robustness_score:.2f}."
         )
+        if guideline_reasons:
+            explanation += f" Comorbidity fit: {guideline_reasons[0]}"
+        return explanation
 
     @staticmethod
     def _build_black_box_warning(
@@ -120,6 +155,7 @@ class CriticAgent:
             "EGFR_METFORMIN_CONTRAINDICATION": "Metformin + Kidney Failure",
             "LOW_EGFR_SGLT2_RISK": "SGLT2 + Severe Kidney Dysfunction",
             "ALT_TZD_RISK": "Pioglitazone + Liver Stress",
+            "HF_TZD_CONTRAINDICATION": "Pioglitazone + Heart Failure",
             "SEVERE_EVENT_BURDEN": "Severe Predicted Toxicity Burden",
         }.get(code, disqualifying.message)
 
@@ -146,7 +182,7 @@ class CriticAgent:
             f"Top candidates: {shortlist}"
         )
         response = await medgemma_client.complete_text(prompt)
-        answer = response.text.strip()
+        answer = self._clean_recommendation_text(response.text)
         if not answer:
             answer = (
                 f"Recommended protocol is {top.protocol.label} because it achieved the highest weighted "

@@ -1,4 +1,4 @@
-.PHONY: bootstrap dev backend frontend test
+.PHONY: bootstrap dev backend frontend test migrate
 
 bootstrap:
 	./scripts/bootstrap.sh
@@ -14,3 +14,6 @@ frontend:
 
 test:
 	. .venv/bin/activate && cd backend && pytest
+
+migrate:
+	. .venv/bin/activate && cd backend && alembic upgrade head

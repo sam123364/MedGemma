@@ -1,4 +1,11 @@
-import { ChatExplainResponse, PatientTwinInput, RunArtifact, RunEvent, RunStartResponse } from "@/lib/types";
+import {
+  ChatExplainResponse,
+  PatientTwinInput,
+  PopulationMapArtifact,
+  RunArtifact,
+  RunEvent,
+  RunStartResponse,
+} from "@/lib/types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000";
 
@@ -16,6 +23,17 @@ export async function createRun(patient: PatientTwinInput, targetCount = 10): Pr
     throw new Error(`Run creation failed: ${response.status} ${errText}`);
   }
 
+  return (await response.json()) as RunStartResponse;
+}
+
+export async function resumeRun(runId: string): Promise<RunStartResponse> {
+  const response = await fetch(`${API_BASE}/api/v1/runs/${runId}/resume`, {
+    method: "POST",
+  });
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Run resume failed: ${response.status} ${errText}`);
+  }
   return (await response.json()) as RunStartResponse;
 }
 
@@ -58,11 +76,13 @@ export function streamRunEvents(
 
   const typedEvents = [
     "run.started",
+    "run.resumed",
     "protocols.generated",
     "coarse.progress",
     "shortlist.ready",
     "highfidelity.progress",
     "critic.done",
+    "population_map.ready",
     "run.completed",
     "run.failed",
   ];
@@ -109,4 +129,19 @@ export async function explainRun(runId: string, question: string): Promise<ChatE
   }
 
   return (await response.json()) as ChatExplainResponse;
+}
+
+export async function fetchPopulationMap(runId: string): Promise<PopulationMapArtifact | null> {
+  const response = await fetch(`${API_BASE}/api/v1/runs/${runId}/population-map`, {
+    method: "GET",
+    cache: "no-store",
+  });
+
+  if (response.status === 202) {
+    return null;
+  }
+  if (!response.ok) {
+    throw new Error(`Failed to fetch population map: ${response.status}`);
+  }
+  return (await response.json()) as PopulationMapArtifact;
 }

@@ -1,7 +1,7 @@
 import pytest
 
 from app.agents.critic import critic_agent
-from app.models.schemas import CoarseSummary, DailyState, ProtocolCandidate, SafetyFlag
+from app.models.schemas import CoarseSummary, DailyState, PatientTwinInput, ProtocolCandidate, SafetyFlag
 
 
 @pytest.mark.asyncio
@@ -65,8 +65,22 @@ async def test_critic_emits_black_box_warning_for_disqualified_protocol() -> Non
             disqualifying=True,
         )
     ]
+    patient = PatientTwinInput(
+        age=60,
+        sex="male",
+        bmi=30.0,
+        hba1c=9.0,
+        fasting_glucose=180.0,
+        systolic_bp=130,
+        diastolic_bp=80,
+        egfr=22.0,
+        alt=30.0,
+        comorbidities=["chronic kidney disease"],
+        meds_current=["metformin"],
+    )
 
     results, _ = await critic_agent.evaluate(
+        patient=patient,
         protocols=[protocol],
         coarse_by_protocol={protocol.protocol_id: coarse},
         trajectories={protocol.protocol_id: trajectory},

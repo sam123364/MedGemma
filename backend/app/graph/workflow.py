@@ -1,183 +1,146 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import UTC, datetime
+from typing import Any
 from uuid import uuid4
 
-from app.agents.critic import critic_agent
-from app.agents.researcher import researcher_agent
-from app.agents.simulator import simulator_agent
 from app.db.sqlite import repository
-from app.models.schemas import PatientTwinInput, RunArtifact
-from app.rag.retriever import retriever
-from app.safety.rules_engine import evaluate_safety
+from app.graph.langgraph_pipeline import LangGraphTrialEngine
+from app.graph.state import TrialGraphState, now_iso
+from app.models.schemas import PatientTwinInput
 from app.services import settings
-
-
-DISCLAIMER = (
-    "Astra-Gemma is a research prototype for simulation and education. "
-    "It does not provide medical advice, diagnosis, or treatment recommendations."
-)
 
 
 class TrialWorkflowService:
     def __init__(self) -> None:
         self._tasks: dict[str, asyncio.Task] = {}
+        self._engine = LangGraphTrialEngine()
 
     def create_run_id(self) -> str:
         return f"run-{uuid4().hex[:12]}"
 
-    def start_run(self, run_id: str, patient: PatientTwinInput, target_count: int = 10) -> None:
-        task = asyncio.create_task(self._execute_run(run_id, patient, target_count))
+    @staticmethod
+    def _base_state(
+        run_id: str,
+        patient: PatientTwinInput,
+        target_count: int,
+        sim_horizon_days: int,
+        coarse_trials: int,
+        high_fidelity_count: int,
+    ) -> TrialGraphState:
+        ts = now_iso()
+        return {
+            "run_id": run_id,
+            "patient": patient.model_dump(mode="json"),
+            "target_count": target_count,
+            "sim_horizon_days": sim_horizon_days,
+            "coarse_trials": coarse_trials,
+            "high_fidelity_count": high_fidelity_count,
+            "error": None,
+            "current_node": None,
+            "completed_nodes": [],
+            "started_at": ts,
+            "updated_at": ts,
+        }
+
+    def start_run(
+        self,
+        run_id: str,
+        patient: PatientTwinInput,
+        target_count: int = 10,
+        sim_horizon_days: int | None = None,
+        coarse_trials: int | None = None,
+        high_fidelity_count: int | None = None,
+    ) -> None:
+        state = self._base_state(
+            run_id=run_id,
+            patient=patient,
+            target_count=target_count,
+            sim_horizon_days=sim_horizon_days or settings.SIM_HORIZON_DAYS,
+            coarse_trials=coarse_trials or settings.COARSE_TRIALS,
+            high_fidelity_count=high_fidelity_count or settings.HIGH_FIDELITY_COUNT,
+        )
+        self._launch_state(run_id, state)
+
+    def _launch_state(self, run_id: str, state: TrialGraphState) -> None:
+        existing = self._tasks.get(run_id)
+        if existing is not None:
+            if not existing.done():
+                existing.cancel()
+            self._tasks.pop(run_id, None)
+        task = asyncio.create_task(self._execute(run_id, state))
         self._tasks[run_id] = task
 
-    async def _execute_run(self, run_id: str, patient: PatientTwinInput, target_count: int) -> None:
+    async def _execute(self, run_id: str, state: TrialGraphState) -> None:
         try:
-            repository.update_run_status(run_id, "running")
-            self._emit(run_id, "run.started", {"run_id": run_id, "status": "running"})
+            await self._engine.run(state)
+        finally:
+            self._tasks.pop(run_id, None)
 
-            repository.save_patient(run_id, patient.model_dump())
-
-            evidence = retriever.retrieve(
-                query=(
-                    f"type 2 diabetes protocol design for patient age {patient.age}, "
-                    f"HbA1c {patient.hba1c}, eGFR {patient.egfr}, objective: {patient.objective}"
-                ),
-                k=12,
-            )
-            repository.save_evidence(run_id, [item.model_dump() for item in evidence])
-
-            protocols = await researcher_agent.generate_protocols(patient, evidence, target_count=target_count)
-            repository.save_protocols(run_id, [protocol.model_dump() for protocol in protocols])
-            self._emit(
-                run_id,
-                "protocols.generated",
-                {
-                    "count": len(protocols),
-                    "protocols": [
-                        {
-                            "protocol_id": p.protocol_id,
-                            "label": p.label,
-                            "meds": p.meds,
-                            "citations": p.citations,
-                        }
-                        for p in protocols
-                    ],
-                },
-            )
-
-            def coarse_progress(payload: dict) -> None:
-                self._emit(run_id, "coarse.progress", payload)
-
-            def high_progress(payload: dict) -> None:
-                self._emit(run_id, "highfidelity.progress", payload)
-
-            coarse, shortlist, trajectories, calibrations = await simulator_agent.run(
-                patient=patient,
-                protocols=protocols,
-                evidence=evidence,
-                total_trials=settings.COARSE_TRIALS,
-                horizon_days=settings.SIM_HORIZON_DAYS,
-                high_fidelity_count=settings.HIGH_FIDELITY_COUNT,
-                coarse_progress_callback=coarse_progress,
-                high_progress_callback=high_progress,
-            )
-
-            for protocol_id, summary in coarse.items():
-                repository.save_coarse_result(run_id, protocol_id, summary.model_dump())
-
-            self._emit(run_id, "shortlist.ready", {"protocol_ids": shortlist})
-
-            flags_by_protocol = {}
-            for protocol in protocols:
-                trajectory = trajectories[protocol.protocol_id]
-                repository.save_daily_states(
-                    run_id,
-                    protocol.protocol_id,
-                    [state.model_dump() for state in trajectory],
-                )
-                flags = evaluate_safety(patient, protocol, trajectory)
-                flags_by_protocol[protocol.protocol_id] = flags
-                repository.save_safety_flags(run_id, [flag.model_dump() for flag in flags])
-
-            results, recommendation = await critic_agent.evaluate(
-                protocols=protocols,
-                coarse_by_protocol=coarse,
-                trajectories=trajectories,
-                flags_by_protocol=flags_by_protocol,
-            )
-
-            for protocol_result in results:
-                repository.save_score(
-                    run_id,
-                    protocol_result.protocol.protocol_id,
-                    protocol_result.score.model_dump(),
-                )
-                citations = [
-                    {
-                        "source_id": source_id,
-                        "source_url": source_url,
-                    }
-                    for source_id, source_url in zip(
-                        protocol_result.protocol.citation_source_ids,
-                        protocol_result.protocol.citations,
-                        strict=False,
-                    )
-                ]
-                repository.save_citations(run_id, protocol_result.protocol.protocol_id, citations)
-
-            artifact = RunArtifact(
+    def resume_run(self, run_id: str) -> TrialGraphState:
+        checkpoint = repository.get_latest_checkpoint(run_id)
+        if checkpoint is None:
+            patient_payload = repository.get_patient(run_id)
+            if patient_payload is None:
+                raise ValueError("No checkpoint or patient payload found for run")
+            patient = PatientTwinInput(**patient_payload)
+            state = self._base_state(
                 run_id=run_id,
-                created_at=datetime.now(UTC),
-                completed_at=datetime.now(UTC),
-                status="completed",
                 patient=patient,
-                evidence=evidence,
-                results=results,
-                final_recommendation=recommendation,
-                disclaimer=DISCLAIMER,
+                target_count=10,
+                sim_horizon_days=settings.SIM_HORIZON_DAYS,
+                coarse_trials=settings.COARSE_TRIALS,
+                high_fidelity_count=settings.HIGH_FIDELITY_COUNT,
             )
-
-            serialized = artifact.model_dump(mode="json")
-            serialized["calibrations"] = calibrations
-            repository.save_run_result(run_id, serialized)
-
-            repository.update_run_status(run_id, "completed")
-            black_box_warnings = [
-                {
-                    "protocol_id": item.protocol.protocol_id,
-                    "label": item.protocol.label,
-                    "warning": item.black_box_warning,
-                    "code": item.black_box_code,
-                }
-                for item in results
-                if item.black_box_warning
-            ]
-            self._emit(
+            repository.update_run_status(run_id, "running", error_message=None)
+            repository.append_event(
                 run_id,
-                "critic.done",
+                "run.resumed",
                 {
-                    "top_protocol_id": results[0].protocol.protocol_id if results else None,
-                    "recommendation": recommendation,
-                    "black_box_warnings": black_box_warnings,
+                    "run_id": run_id,
+                    "from_node": "none",
+                    "status": "running",
                 },
             )
-            self._emit(
-                run_id,
-                "run.completed",
-                {
-                    "status": "completed",
-                    "top_protocol_id": results[0].protocol.protocol_id if results else None,
-                    "result_count": len(results),
-                },
-            )
-        except Exception as exc:
-            repository.update_run_status(run_id, "failed", error_message=str(exc))
-            self._emit(run_id, "run.failed", {"status": "failed", "error": str(exc)})
-            raise
+            self._launch_state(run_id, state)
+            return state
 
-    def _emit(self, run_id: str, event_type: str, payload: dict) -> None:
-        repository.append_event(run_id, event_type, payload)
+        state = checkpoint["state_json"]
+        if not isinstance(state, dict):
+            raise ValueError("Checkpoint state malformed")
+
+        state = dict(state)
+        state["error"] = None
+        state["updated_at"] = now_iso()
+        repository.update_run_status(run_id, "running", error_message=None)
+        repository.mark_checkpoint_resumed(checkpoint["id"])
+        repository.append_event(
+            run_id,
+            "run.resumed",
+            {
+                "run_id": run_id,
+                "from_node": checkpoint["node_name"],
+                "status": "running",
+            },
+        )
+        self._launch_state(run_id, state)  # type: ignore[arg-type]
+        return state  # type: ignore[return-value]
+
+    def auto_resume_incomplete_runs(self) -> list[str]:
+        resumed: list[str] = []
+        for run_id in repository.get_incomplete_runs():
+            if run_id in self._tasks and not self._tasks[run_id].done():
+                continue
+            try:
+                self.resume_run(run_id)
+                resumed.append(run_id)
+            except Exception:
+                continue
+        return resumed
+
+    def run_is_active(self, run_id: str) -> bool:
+        task = self._tasks.get(run_id)
+        return bool(task and not task.done())
 
 
 workflow_service = TrialWorkflowService()

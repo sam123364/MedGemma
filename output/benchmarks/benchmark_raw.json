@@ -1,0 +1,130 @@
+{
+  "runtime": "mock",
+  "model": "medgemma-27b-text-it",
+  "profiles": [
+    {
+      "profile": {
+        "name": "demo",
+        "sim_horizon_days": 30,
+        "coarse_trials": 120,
+        "high_fidelity_count": 2,
+        "target_count": 8,
+        "runs": 5,
+        "timeout_seconds": 900
+      },
+      "total_runs": 5,
+      "completed_runs": 5,
+      "failed_runs": 0,
+      "timeout_runs": 0,
+      "completion_rate": 100.0,
+      "end_to_end_mean_seconds": 0.514,
+      "end_to_end_std_seconds": 0.013,
+      "runs": [
+        {
+          "run_id": "run-f2eefacacb67",
+          "status": "completed",
+          "error": null,
+          "stages": {
+            "run.started": 0.0,
+            "protocols.generated": 0.124,
+            "shortlist.ready": 0.15,
+            "critic.done": 0.166,
+            "population_map.ready": 0.533,
+            "run.completed": 0.54,
+            "end_to_end_seconds": 0.54
+          }
+        },
+        {
+          "run_id": "run-aeb995dcb116",
+          "status": "completed",
+          "error": null,
+          "stages": {
+            "run.started": 0.0,
+            "protocols.generated": 0.096,
+            "shortlist.ready": 0.111,
+            "critic.done": 0.126,
+            "population_map.ready": 0.501,
+            "run.completed": 0.508,
+            "end_to_end_seconds": 0.508
+          }
+        },
+        {
+          "run_id": "run-1ccbe84844c1",
+          "status": "completed",
+          "error": null,
+          "stages": {
+            "run.started": 0.0,
+            "protocols.generated": 0.109,
+            "shortlist.ready": 0.124,
+            "critic.done": 0.138,
+            "population_map.ready": 0.504,
+            "run.completed": 0.511,
+            "end_to_end_seconds": 0.511
+          }
+        },
+        {
+          "run_id": "run-40c5552ed65c",
+          "status": "completed",
+          "error": null,
+          "stages": {
+            "run.started": 0.0,
+            "protocols.generated": 0.109,
+            "shortlist.ready": 0.124,
+            "critic.done": 0.137,
+            "population_map.ready": 0.504,
+            "run.completed": 0.511,
+            "end_to_end_seconds": 0.511
+          }
+        },
+        {
+          "run_id": "run-7f7d1423f397",
+          "status": "completed",
+          "error": null,
+          "stages": {
+            "run.started": 0.0,
+            "protocols.generated": 0.1,
+            "shortlist.ready": 0.115,
+            "critic.done": 0.129,
+            "population_map.ready": 0.496,
+            "run.completed": 0.502,
+            "end_to_end_seconds": 0.502
+          }
+        }
+      ]
+    },
+    {
+      "profile": {
+        "name": "full",
+        "sim_horizon_days": 180,
+        "coarse_trials": 1000,
+        "high_fidelity_count": 5,
+        "target_count": 10,
+        "runs": 1,
+        "timeout_seconds": 900
+      },
+      "total_runs": 1,
+      "completed_runs": 1,
+      "failed_runs": 0,
+      "timeout_runs": 0,
+      "completion_rate": 100.0,
+      "end_to_end_mean_seconds": 3.078,
+      "end_to_end_std_seconds": 0.0,
+      "runs": [
+        {
+          "run_id": "run-94769577d246",
+          "status": "completed",
+          "error": null,
+          "stages": {
+            "run.started": 0.0,
+            "protocols.generated": 0.112,
+            "shortlist.ready": 0.347,
+            "critic.done": 0.408,
+            "population_map.ready": 3.035,
+            "run.completed": 3.078,
+            "end_to_end_seconds": 3.078
+          }
+        }
+      ]
+    }
+  ]
+}

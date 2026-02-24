@@ -7,6 +7,12 @@ npm install
 npm run dev
 ```
 
+## E2E
+
+```bash
+npx playwright test
+```
+
 Set API base URL when needed:
 
 ```bash
@@ -17,4 +23,3 @@ NEXT_PUBLIC_API_BASE=http://localhost:8000
 
 - `/` patient twin builder
 - `/run/[id]` live simulation theater
-

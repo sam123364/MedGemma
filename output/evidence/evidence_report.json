@@ -1,0 +1,14 @@
+{
+  "target_count": 500,
+  "collection_count": 500,
+  "duplicates": 0,
+  "duplicate_rate_percent": 0.0,
+  "missing_year_count": 0,
+  "year_distribution_top20": {
+    "2025": 324,
+    "2026": 176
+  },
+  "meets_target_count": true,
+  "meets_duplicate_budget": true,
+  "chroma_path": "data/chroma"
+}

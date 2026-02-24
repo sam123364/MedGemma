@@ -23,7 +23,7 @@ class MedGemmaClient:
     def __init__(self) -> None:
         self.runtime = settings.MEDGEMMA_RUNTIME
         self.model = settings.MEDGEMMA_MODEL
-        self._http = httpx.AsyncClient(timeout=90.0)
+        self._http = httpx.AsyncClient(timeout=settings.MEDGEMMA_TIMEOUT_SECONDS)
 
     async def warmup(self) -> None:
         try:
@@ -52,10 +52,29 @@ class MedGemmaClient:
                 {"role": "user", "content": prompt},
             ],
             "temperature": 0.2,
-            "max_tokens": 900,
+            "max_tokens": settings.MEDGEMMA_MAX_TOKENS,
         }
-        resp = await self._http.post(settings.MEDGEMMA_MLX_ENDPOINT, json=body)
-        resp.raise_for_status()
+        try:
+            resp = await self._http.post(settings.MEDGEMMA_MLX_ENDPOINT, json=body)
+            resp.raise_for_status()
+        except httpx.TimeoutException as exc:
+            raise RuntimeError(
+                "MedGemma request timed out "
+                f"after {settings.MEDGEMMA_TIMEOUT_SECONDS:.0f}s "
+                f"(endpoint={settings.MEDGEMMA_MLX_ENDPOINT}, model={self.model}). "
+                "Increase MEDGEMMA_TIMEOUT_SECONDS or reduce prompt/token load."
+            ) from exc
+        except httpx.HTTPStatusError as exc:
+            status = exc.response.status_code if exc.response is not None else "unknown"
+            body_preview = ""
+            if exc.response is not None:
+                body_preview = exc.response.text[:220]
+            raise RuntimeError(
+                f"MedGemma endpoint returned HTTP {status}. Response preview: {body_preview}"
+            ) from exc
+        except httpx.HTTPError as exc:
+            raise RuntimeError(f"MedGemma transport error: {exc}") from exc
+
         data = resp.json()
         text = (
             data.get("choices", [{}])[0]
@@ -131,4 +150,3 @@ class MedGemmaClient:
 
 
 medgemma_client = MedGemmaClient()
-

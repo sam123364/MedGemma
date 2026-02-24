@@ -18,6 +18,7 @@ class SimulatorAgent:
         high_fidelity_count: int,
         coarse_progress_callback: Callable[[dict], None] | None = None,
         high_progress_callback: Callable[[dict], None] | None = None,
+        shortlist_callback: Callable[[list[str]], None] | None = None,
     ) -> tuple[dict[str, CoarseSummary], list[str], dict[str, list[DailyState]], dict[str, dict]]:
         coarse = run_coarse_trials(
             patient=patient,
@@ -39,6 +40,8 @@ class SimulatorAgent:
         )
 
         shortlist = [item.protocol_id for item in ranked[:high_fidelity_count]]
+        if shortlist_callback:
+            shortlist_callback(shortlist)
 
         trajectories: dict[str, list[DailyState]] = {}
         calibrations: dict[str, dict] = {}
@@ -101,4 +104,3 @@ class SimulatorAgent:
 
 
 simulator_agent = SimulatorAgent()
-

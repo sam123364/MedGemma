@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from app.models.schemas import DailyState, PatientTwinInput, ProtocolCandidate, SafetyFlag
+from app.safety.comorbidity_policy import assess_protocol_against_profile
 
 
 def evaluate_safety(
@@ -10,6 +11,10 @@ def evaluate_safety(
 ) -> list[SafetyFlag]:
     flags: list[SafetyFlag] = []
     meds = {m.lower() for m in protocol.meds}
+
+    profile_assessment = assess_protocol_against_profile(patient, protocol)
+    flags.extend(profile_assessment.soft_flags)
+    flags.extend(profile_assessment.hard_flags)
 
     if "metformin" in meds and patient.egfr < 30:
         flags.append(
@@ -91,4 +96,3 @@ def evaluate_safety(
 
 def has_disqualifying_flag(flags: list[SafetyFlag]) -> bool:
     return any(flag.disqualifying for flag in flags)
-

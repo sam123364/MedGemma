@@ -1,0 +1,224 @@
+  - main:
+    - paragraph: Run ID
+    - heading "run-8a9da8d441d6" [ref=e1] [level=1]
+    - paragraph: "Workflow Status: Run completed"
+    - link "New patient run" [ref=e2]:
+      - /url: /
+    - heading "180-Day HbA1c Divergence" [ref=e3] [level=3]
+    - paragraph: Top protocols from agentic shortlist with safety-aware ranking.
+    - paragraph: SGLT2 + GLP-1 dual non-insulin
+    - paragraph: Metformin + GLP-1 base protocol (blocked)
+    - paragraph: Lifestyle-first intensification (blocked)
+    - paragraph: Metformin + TZD (blocked)
+    - paragraph: Metformin + GLP-1 + SGLT2 (blocked)
+    - heading "Agentic Workflow Timeline" [ref=e4] [level=3]
+        - paragraph: run.started
+        - code: "{\"schema_version\":\"1.0.0\",\"run_id\":\"run-8a9da8d441d6\",\"timestamp\":\"2026-02-09T20:16:49.719439+00:00\",\"status\":\"running\"}"
+        - paragraph: protocols.generated
+        - code: "{\"schema_version\":\"1.0.0\",\"run_id\":\"run-8a9da8d441d6\",\"timestamp\":\"2026-02-09T20:16:49.722225+00:00\",\"count\":10,\"protocols\":[{\"protocol_id\":\"P-GLP1-MET\",\"label\":\"Metformin + GLP-1 base protocol\",\"meds\":[\"metformin\",\"semaglutide\"],\"citations\":[\"https://diabetesjournals.org/care\",\"https://pubmed.ncbi.nlm.nih.gov/36781234/\"]},{\"protocol_id\":\"P-LIFESTYLE-INTENSIVE\",\"label\":\"Lifestyle-first intensification\",\"meds\":[\"metformin\"],\"citations\":[\"https://pubmed.ncbi.nlm.nih.gov/34000320/\",\"https://pubmed.ncbi.nlm.nih.gov/35121018/\"]},{\"protocol_id\":\"P-MET-TZD\",\"label\":\"Metformin + TZD\",\"meds\":[\"metformin\",\"pioglitazone\"],\"citations\":[\"https://www.easd.org\",\"https://pubmed.ncbi.nlm.nih.gov/36781234/\"]},{\"protocol_id\":\"P-TRIPLE-MGS\",\"label\":\"Metformin + GLP-1 + SGLT2\",\"meds\":[\"metformin\",\"semaglutide\",\"dapagliflozin\"],\"citations\":[\"https://pubmed.ncbi.nlm.nih.gov/34000320/\",\"https://pubmed.ncbi.nlm.nih.gov/39000210/\"]},{\"protocol_id\":\"P-MET-GLP1\",\"label\":\"Metformin + GLP-1 receptor agonist\",\"meds\":[\"metformin\",\"semaglutide\"],\"citations\":[\"https://pubmed.ncbi.nlm.nih.gov/34000320/\",\"https://www.easd.org\"]},{\"protocol_id\":\"P-BASAL-START\",\"label\":\"Basal insulin start + metformin\",\"meds\":[\"metformin\",\"insulin glargine\"],\"citations\":[\"https://www.easd.org\",\"https://pubmed.ncbi.nlm.nih.gov/35121018/\"]},{\"protocol_id\":\"P-MET-DPP4\",\"label\":\"Metformin + DPP4 inhibitor\",\"meds\":[\"metformin\",\"sitagliptin\"],\"citations\":[\"https://www.easd.org\",\"https://diabetesjournals.org/care\"]},{\"protocol_id\":\"P-MET-SU\",\"label\":\"Metformin + sulfonylurea\",\"meds\":[\"metformin\",\"glimepiride\"],\"citations\":[\"https://pubmed.ncbi.nlm.nih.gov/39000210/\",\"https://pubmed.ncbi.nlm.nih.gov/34000320/\"]},{\"protocol_id\":\"P-MET-SGLT2\",\"label\":\"Metformin + SGLT2 inhibitor\",\"meds\":[\"metformin\",\"empagliflozin\"],\"citations\":[\"https://diabetesjournals.org/care\",\"https://pubmed.ncbi.nlm.nih.gov/36781234/\"]},{\"protocol_id\":\"P-SGLT2-GLP1\",\"label\":\"SGLT2 + GLP-1 dual non-insulin\",\"meds\":[\"empagliflozin\",\"semaglutide\"],\"citations\":[\"https://pubmed.ncbi.nlm.nih.gov/35121018/\",\"https://diabetesjournals.org/care\"]}]}"
+        - paragraph: coarse.progress
+        - code: "{\"schema_version\":\"1.0.0\",\"run_id\":\"run-8a9da8d441d6\",\"timestamp\":\"2026-02-09T20:16:49.768826+00:00\",\"completed_protocols\":1,\"total_protocols\":10,\"protocol_id\":\"P-GLP1-MET\"}"
+        - paragraph: coarse.progress
+        - code: "{\"schema_version\":\"1.0.0\",\"run_id\":\"run-8a9da8d441d6\",\"timestamp\":\"2026-02-09T20:16:49.795037+00:00\",\"completed_protocols\":2,\"total_protocols\":10,\"protocol_id\":\"P-LIFESTYLE-INTENSIVE\"}"
+        - paragraph: coarse.progress
+        - code: "{\"schema_version\":\"1.0.0\",\"run_id\":\"run-8a9da8d441d6\",\"timestamp\":\"2026-02-09T20:16:49.820208+00:00\",\"completed_protocols\":3,\"total_protocols\":10,\"protocol_id\":\"P-MET-TZD\"}"
+        - paragraph: coarse.progress
+        - code: "{\"schema_version\":\"1.0.0\",\"run_id\":\"run-8a9da8d441d6\",\"timestamp\":\"2026-02-09T20:16:49.845713+00:00\",\"completed_protocols\":4,\"total_protocols\":10,\"protocol_id\":\"P-TRIPLE-MGS\"}"
+        - paragraph: coarse.progress
+        - code: "{\"schema_version\":\"1.0.0\",\"run_id\":\"run-8a9da8d441d6\",\"timestamp\":\"2026-02-09T20:16:49.876342+00:00\",\"completed_protocols\":5,\"total_protocols\":10,\"protocol_id\":\"P-MET-GLP1\"}"
+        - paragraph: coarse.progress
+        - code: "{\"schema_version\":\"1.0.0\",\"run_id\":\"run-8a9da8d441d6\",\"timestamp\":\"2026-02-09T20:16:49.903902+00:00\",\"completed_protocols\":6,\"total_protocols\":10,\"protocol_id\":\"P-BASAL-START\"}"
+        - paragraph: coarse.progress
+        - code: "{\"schema_version\":\"1.0.0\",\"run_id\":\"run-8a9da8d441d6\",\"timestamp\":\"2026-02-09T20:16:49.928725+00:00\",\"completed_protocols\":7,\"total_protocols\":10,\"protocol_id\":\"P-MET-DPP4\"}"
+        - paragraph: coarse.progress
+        - code: "{\"schema_version\":\"1.0.0\",\"run_id\":\"run-8a9da8d441d6\",\"timestamp\":\"2026-02-09T20:16:49.956366+00:00\",\"completed_protocols\":8,\"total_protocols\":10,\"protocol_id\":\"P-MET-SU\"}"
+        - paragraph: coarse.progress
+        - code: "{\"schema_version\":\"1.0.0\",\"run_id\":\"run-8a9da8d441d6\",\"timestamp\":\"2026-02-09T20:16:49.982204+00:00\",\"completed_protocols\":9,\"total_protocols\":10,\"protocol_id\":\"P-MET-SGLT2\"}"
+        - paragraph: coarse.progress
+        - code: "{\"schema_version\":\"1.0.0\",\"run_id\":\"run-8a9da8d441d6\",\"timestamp\":\"2026-02-09T20:16:50.006907+00:00\",\"completed_protocols\":10,\"total_protocols\":10,\"protocol_id\":\"P-SGLT2-GLP1\"}"
+        - paragraph: highfidelity.progress
+        - code: "{\"schema_version\":\"1.0.0\",\"run_id\":\"run-8a9da8d441d6\",\"timestamp\":\"2026-02-09T20:16:50.009130+00:00\",\"completed\":1,\"total\":5,\"protocol_id\":\"P-TRIPLE-MGS\"}"
+        - paragraph: highfidelity.progress
+        - code: "{\"schema_version\":\"1.0.0\",\"run_id\":\"run-8a9da8d441d6\",\"timestamp\":\"2026-02-09T20:16:50.010832+00:00\",\"completed\":2,\"total\":5,\"protocol_id\":\"P-SGLT2-GLP1\"}"
+        - paragraph: highfidelity.progress
+        - code: "{\"schema_version\":\"1.0.0\",\"run_id\":\"run-8a9da8d441d6\",\"timestamp\":\"2026-02-09T20:16:50.012419+00:00\",\"completed\":3,\"total\":5,\"protocol_id\":\"P-BASAL-START\"}"
+        - paragraph: highfidelity.progress
+        - code: "{\"schema_version\":\"1.0.0\",\"run_id\":\"run-8a9da8d441d6\",\"timestamp\":\"2026-02-09T20:16:50.014026+00:00\",\"completed\":4,\"total\":5,\"protocol_id\":\"P-MET-GLP1\"}"
+        - paragraph: highfidelity.progress
+        - code: "{\"schema_version\":\"1.0.0\",\"run_id\":\"run-8a9da8d441d6\",\"timestamp\":\"2026-02-09T20:16:50.015666+00:00\",\"completed\":5,\"total\":5,\"protocol_id\":\"P-GLP1-MET\"}"
+        - paragraph: shortlist.ready
+        - code: "{\"schema_version\":\"1.0.0\",\"run_id\":\"run-8a9da8d441d6\",\"timestamp\":\"2026-02-09T20:16:50.019572+00:00\",\"protocol_ids\":[\"P-TRIPLE-MGS\",\"P-SGLT2-GLP1\",\"P-BASAL-START\",\"P-MET-GLP1\",\"P-GLP1-MET\"]}"
+        - paragraph: critic.done
+        - code: "{\"schema_version\":\"1.0.0\",\"run_id\":\"run-8a9da8d441d6\",\"timestamp\":\"2026-02-09T20:16:50.056102+00:00\",\"top_protocol_id\":\"P-SGLT2-GLP1\",\"recommendation\":\"MedGemma mock response.\",\"black_box_warnings\":[{\"protocol_id\":\"P-GLP1-MET\",\"label\":\"Metformin + GLP-1 base protocol\",\"warning\":\"PROTOCOL REJECTED: Contraindication found (Metformin + Kidney Failure).\",\"code\":\"EGFR_METFORMIN_CONTRAINDICATION\"},{\"protocol_id\":\"P-LIFESTYLE-INTENSIVE\",\"label\":\"Lifestyle-first intensification\",\"warning\":\"PROTOCOL REJECTED: Contraindication found (Metformin + Kidney Failure).\",\"code\":\"EGFR_METFORMIN_CONTRAINDICATION\"},{\"protocol_id\":\"P-MET-TZD\",\"label\":\"Metformin + TZD\",\"warning\":\"PROTOCOL REJECTED: Contraindication found (Metformin + Kidney Failure).\",\"code\":\"EGFR_METFORMIN_CONTRAINDICATION\"},{\"protocol_id\":\"P-TRIPLE-MGS\",\"label\":\"Metformin + GLP-1 + SGLT2\",\"warning\":\"PROTOCOL REJECTED: Contraindication found (Metformin + Kidney Failure).\",\"code\":\"EGFR_METFORMIN_CONTRAINDICATION\"},{\"protocol_id\":\"P-MET-GLP1\",\"label\":\"Metformin + GLP-1 receptor agonist\",\"warning\":\"PROTOCOL REJECTED: Contraindication found (Metformin + Kidney Failure).\",\"code\":\"EGFR_METFORMIN_CONTRAINDICATION\"},{\"protocol_id\":\"P-BASAL-START\",\"label\":\"Basal insulin start + metformin\",\"warning\":\"PROTOCOL REJECTED: Contraindication found (Metformin + Kidney Failure).\",\"code\":\"EGFR_METFORMIN_CONTRAINDICATION\"},{\"protocol_id\":\"P-MET-DPP4\",\"label\":\"Metformin + DPP4 inhibitor\",\"warning\":\"PROTOCOL REJECTED: Contraindication found (Metformin + Kidney Failure).\",\"code\":\"EGFR_METFORMIN_CONTRAINDICATION\"},{\"protocol_id\":\"P-MET-SU\",\"label\":\"Metformin + sulfonylurea\",\"warning\":\"PROTOCOL REJECTED: Contraindication found (Metformin + Kidney Failure).\",\"code\":\"EGFR_METFORMIN_CONTRAINDICATION\"},{\"protocol_id\":\"P-MET-SGLT2\",\"label\":\"Metformin + SGLT2 inhibitor\",\"warning\":\"PROTOCOL REJECTED: Contraindication found (Metformin + Kidney Failure).\",\"code\":\"EGFR_METFORMIN_CONTRAINDICATION\"}]}"
+        - paragraph: run.completed
+        - code: "{\"schema_version\":\"1.0.0\",\"run_id\":\"run-8a9da8d441d6\",\"timestamp\":\"2026-02-09T20:16:50.056258+00:00\",\"status\":\"completed\",\"top_protocol_id\":\"P-SGLT2-GLP1\",\"result_count\":10}"
+    - region "Protocol rejection safety warnings" [ref=e5]:
+      - heading "Black Box Warning" [ref=e6] [level=2]
+        - strong: "PROTOCOL REJECTED: Contraindication found (Metformin + Kidney Failure)."
+        - paragraph: "Protocol: Metformin + GLP-1 base protocol"
+        - text: "Code: EGFR_METFORMIN_CONTRAINDICATION"
+        - strong: "PROTOCOL REJECTED: Contraindication found (Metformin + Kidney Failure)."
+        - paragraph: "Protocol: Lifestyle-first intensification"
+        - text: "Code: EGFR_METFORMIN_CONTRAINDICATION"
+        - strong: "PROTOCOL REJECTED: Contraindication found (Metformin + Kidney Failure)."
+        - paragraph: "Protocol: Metformin + TZD"
+        - text: "Code: EGFR_METFORMIN_CONTRAINDICATION"
+        - strong: "PROTOCOL REJECTED: Contraindication found (Metformin + Kidney Failure)."
+        - paragraph: "Protocol: Metformin + GLP-1 + SGLT2"
+        - text: "Code: EGFR_METFORMIN_CONTRAINDICATION"
+        - strong: "PROTOCOL REJECTED: Contraindication found (Metformin + Kidney Failure)."
+        - paragraph: "Protocol: Metformin + GLP-1 receptor agonist"
+        - text: "Code: EGFR_METFORMIN_CONTRAINDICATION"
+        - strong: "PROTOCOL REJECTED: Contraindication found (Metformin + Kidney Failure)."
+        - paragraph: "Protocol: Basal insulin start + metformin"
+        - text: "Code: EGFR_METFORMIN_CONTRAINDICATION"
+        - strong: "PROTOCOL REJECTED: Contraindication found (Metformin + Kidney Failure)."
+        - paragraph: "Protocol: Metformin + DPP4 inhibitor"
+        - text: "Code: EGFR_METFORMIN_CONTRAINDICATION"
+        - strong: "PROTOCOL REJECTED: Contraindication found (Metformin + Kidney Failure)."
+        - paragraph: "Protocol: Metformin + sulfonylurea"
+        - text: "Code: EGFR_METFORMIN_CONTRAINDICATION"
+        - strong: "PROTOCOL REJECTED: Contraindication found (Metformin + Kidney Failure)."
+        - paragraph: "Protocol: Metformin + SGLT2 inhibitor"
+        - text: "Code: EGFR_METFORMIN_CONTRAINDICATION"
+    - heading "Final Recommendation" [ref=e7] [level=2]
+    - paragraph: MedGemma mock response.
+    - article:
+      - heading "SGLT2 + GLP-1 dual non-insulin" [ref=e8] [level=3]
+      - paragraph: SGLT2 + GLP-1 dual non-insulin scored 0.71 with efficacy 0.74, safety 0.63, adherence 0.63, and robustness 0.81.
+      - text: "Score: 0.705"
+    - heading "Ranked Protocol Board" [ref=e9] [level=3]
+        - row "# Protocol Total Score Efficacy Safety Flags Citations":
+          - columnheader "#" [ref=e10]
+          - columnheader "Protocol" [ref=e11]
+          - columnheader "Total Score" [ref=e12]
+          - columnheader "Efficacy" [ref=e13]
+          - columnheader "Safety" [ref=e14]
+          - columnheader "Flags" [ref=e15]
+          - columnheader "Citations" [ref=e16]
+        - row "1 SGLT2 + GLP-1 dual non-insulin empagliflozin + semaglutide 0.705 0.739 0.627 0 Source 1 Source 2":
+          - cell "1" [ref=e17]
+          - cell "SGLT2 + GLP-1 dual non-insulin empagliflozin + semaglutide" [ref=e18]:
+            - strong: SGLT2 + GLP-1 dual non-insulin
+            - paragraph: empagliflozin + semaglutide
+          - cell "0.705" [ref=e19]
+          - cell "0.739" [ref=e20]
+          - cell "0.627" [ref=e21]
+          - cell "0" [ref=e22]
+          - cell "Source 1 Source 2" [ref=e23]:
+            - link "Source 1" [ref=e24]:
+            - link "Source 2" [ref=e25]:
+        - row "2 Metformin + GLP-1 base protocol metformin + semaglutide 0.000 0.729 0.567 1 Source 1 Source 2":
+          - cell "2" [ref=e26]
+          - cell "Metformin + GLP-1 base protocol metformin + semaglutide" [ref=e27]:
+            - strong: Metformin + GLP-1 base protocol
+            - paragraph: metformin + semaglutide
+          - cell "0.000" [ref=e28]
+          - cell "0.729" [ref=e29]
+          - cell "0.567" [ref=e30]
+          - cell "1" [ref=e31] [nth=1]
+          - cell "Source 1 Source 2" [ref=e32] [nth=1]:
+            - link "Source 1" [ref=e33] [nth=1]:
+            - link "Source 2" [ref=e34] [nth=1]:
+        - row "3 Lifestyle-first intensification metformin 0.000 0.406 0.653 1 Source 1 Source 2":
+          - cell "3" [ref=e35]
+          - cell "Lifestyle-first intensification metformin" [ref=e36]:
+            - strong: Lifestyle-first intensification
+            - paragraph: metformin
+          - cell "0.000" [ref=e37] [nth=1]
+          - cell "0.406" [ref=e38]
+          - cell "0.653" [ref=e39]
+          - cell "1" [ref=e40] [nth=2]
+          - cell "Source 1 Source 2" [ref=e41] [nth=2]:
+            - link "Source 1" [ref=e42] [nth=2]:
+            - link "Source 2" [ref=e43] [nth=2]:
+        - row "4 Metformin + TZD metformin + pioglitazone 0.000 0.465 0.516 1 Source 1 Source 2":
+          - cell "4" [ref=e44]
+          - cell "Metformin + TZD metformin + pioglitazone" [ref=e45]:
+            - strong: Metformin + TZD
+            - paragraph: metformin + pioglitazone
+          - cell "0.000" [ref=e46] [nth=2]
+          - cell "0.465" [ref=e47]
+          - cell "0.516" [ref=e48]
+          - cell "1" [ref=e49] [nth=3]
+          - cell "Source 1 Source 2" [ref=e50] [nth=3]:
+            - link "Source 1" [ref=e51] [nth=3]:
+            - link "Source 2" [ref=e52] [nth=3]:
+        - row "5 Metformin + GLP-1 + SGLT2 metformin + semaglutide + dapagliflozin 0.000 0.811 0.432 1 Source 1 Source 2":
+          - cell "5" [ref=e53]
+          - cell "Metformin + GLP-1 + SGLT2 metformin + semaglutide + dapagliflozin" [ref=e54]:
+            - strong: Metformin + GLP-1 + SGLT2
+            - paragraph: metformin + semaglutide + dapagliflozin
+          - cell "0.000" [ref=e55] [nth=3]
+          - cell "0.811" [ref=e56]
+          - cell "0.432" [ref=e57]
+          - cell "1" [ref=e58] [nth=4]
+          - cell "Source 1 Source 2" [ref=e59] [nth=4]:
+            - link "Source 1" [ref=e60] [nth=4]:
+            - link "Source 2" [ref=e61] [nth=4]:
+        - row "6 Metformin + GLP-1 receptor agonist metformin + semaglutide 0.000 0.818 0.553 1 Source 1 Source 2":
+          - cell "6" [ref=e62]
+          - cell "Metformin + GLP-1 receptor agonist metformin + semaglutide" [ref=e63]:
+            - strong: Metformin + GLP-1 receptor agonist
+            - paragraph: metformin + semaglutide
+          - cell "0.000" [ref=e64] [nth=4]
+          - cell "0.818" [ref=e65]
+          - cell "0.553" [ref=e66]
+          - cell "1" [ref=e67] [nth=5]
+          - cell "Source 1 Source 2" [ref=e68] [nth=5]:
+            - link "Source 1" [ref=e69] [nth=5]:
+            - link "Source 2" [ref=e70] [nth=5]:
+        - row "7 Basal insulin start + metformin metformin + insulin glargine 0.000 0.737 0.383 1 Source 1 Source 2":
+          - cell "7" [ref=e71]
+          - cell "Basal insulin start + metformin metformin + insulin glargine" [ref=e72]:
+            - strong: Basal insulin start + metformin
+            - paragraph: metformin + insulin glargine
+          - cell "0.000" [ref=e73] [nth=5]
+          - cell "0.737" [ref=e74]
+          - cell "0.383" [ref=e75]
+          - cell "1" [ref=e76] [nth=6]
+          - cell "Source 1 Source 2" [ref=e77] [nth=6]:
+            - link "Source 1" [ref=e78] [nth=6]:
+            - link "Source 2" [ref=e79] [nth=6]:
+        - row "8 Metformin + DPP4 inhibitor metformin + sitagliptin 0.000 0.398 0.644 1 Source 1 Source 2":
+          - cell "8" [ref=e80]
+          - cell "Metformin + DPP4 inhibitor metformin + sitagliptin" [ref=e81]:
+            - strong: Metformin + DPP4 inhibitor
+            - paragraph: metformin + sitagliptin
+          - cell "0.000" [ref=e82] [nth=6]
+          - cell "0.398" [ref=e83]
+          - cell "0.644" [ref=e84]
+          - cell "1" [ref=e85] [nth=7]
+          - cell "Source 1 Source 2" [ref=e86] [nth=7]:
+            - link "Source 1" [ref=e87] [nth=7]:
+            - link "Source 2" [ref=e88] [nth=7]:
+        - row "9 Metformin + sulfonylurea metformin + glimepiride 0.000 0.484 0.357 1 Source 1 Source 2":
+          - cell "9" [ref=e89]
+          - cell "Metformin + sulfonylurea metformin + glimepiride" [ref=e90]:
+            - strong: Metformin + sulfonylurea
+            - paragraph: metformin + glimepiride
+          - cell "0.000" [ref=e91] [nth=7]
+          - cell "0.484" [ref=e92]
+          - cell "0.357" [ref=e93]
+          - cell "1" [ref=e94] [nth=8]
+          - cell "Source 1 Source 2" [ref=e95] [nth=8]:
+            - link "Source 1" [ref=e96] [nth=8]:
+            - link "Source 2" [ref=e97] [nth=8]:
+        - row "10 Metformin + SGLT2 inhibitor metformin + empagliflozin 0.000 0.520 0.591 1 Source 1 Source 2":
+          - cell "10" [ref=e98]
+          - cell "Metformin + SGLT2 inhibitor metformin + empagliflozin" [ref=e99]:
+            - strong: Metformin + SGLT2 inhibitor
+            - paragraph: metformin + empagliflozin
+          - cell "0.000" [ref=e100] [nth=8]
+          - cell "0.520" [ref=e101]
+          - cell "0.591" [ref=e102]
+          - cell "1" [ref=e103] [nth=9]
+          - cell "Source 1 Source 2" [ref=e104] [nth=9]:
+            - link "Source 1" [ref=e105] [nth=9]:
+            - link "Source 2" [ref=e106] [nth=9]:
+    - heading "Dr. MedGemma Explainability Console" [ref=e107] [level=3]
+    - paragraph: Grounded in run artifacts only.
+        - text: Dr. Gemma
+        - paragraph: I can explain protocol ranking decisions using only this run's artifacts.
+    - button "Ask" [ref=e108]
+    - paragraph: Astra-Gemma is a research prototype for simulation and education. It does not provide medical advice, diagnosis, or treatment recommendations.

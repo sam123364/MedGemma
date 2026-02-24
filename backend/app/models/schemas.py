@@ -104,8 +104,30 @@ class ProtocolResult(SchemaVersioned):
     flags: list[SafetyFlag]
     score: ProtocolScore
     explanation: str
+    guideline_reasons: list[str] = Field(default_factory=list)
     black_box_warning: str | None = None
     black_box_code: str | None = None
+
+
+class PopulationMapCell(SchemaVersioned):
+    cell_id: str
+    age: int
+    egfr: float
+    hba1c: float
+    top_protocol_id: str
+    top_protocol_label: str
+    top_score: float
+    runner_up_protocol_id: str | None = None
+    runner_up_score: float | None = None
+    confidence_margin: float
+    disqualified_count: int = 0
+
+
+class PopulationMapArtifact(SchemaVersioned):
+    run_id: str
+    axes: dict[str, list[float]]
+    cells: list[PopulationMapCell]
+    generated_at: datetime
 
 
 class RunArtifact(SchemaVersioned):
@@ -118,6 +140,7 @@ class RunArtifact(SchemaVersioned):
     results: list[ProtocolResult]
     final_recommendation: str
     disclaimer: str
+    population_map: PopulationMapArtifact | None = None
 
 
 class RunStartResponse(SchemaVersioned):
@@ -131,6 +154,15 @@ class EventEnvelope(SchemaVersioned):
     event_type: str
     timestamp: datetime
     payload: dict[str, Any]
+
+
+class RunCheckpoint(SchemaVersioned):
+    id: int
+    run_id: str
+    node_name: str
+    state_json: dict[str, Any]
+    status: str
+    created_at: datetime
 
 
 class ChatExplainRequest(SchemaVersioned):

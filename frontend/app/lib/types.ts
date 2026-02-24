@@ -95,6 +95,32 @@ export type ProtocolResult = {
   black_box_code?: string | null;
 };
 
+export type PopulationMapCell = {
+  cell_id: string;
+  age: number;
+  egfr: number;
+  hba1c: number;
+  top_protocol_id: string;
+  top_protocol_label: string;
+  top_score: number;
+  runner_up_protocol_id?: string | null;
+  runner_up_score?: number | null;
+  confidence_margin: number;
+  disqualified_count: number;
+};
+
+export type PopulationMapArtifact = {
+  schema_version: string;
+  run_id: string;
+  axes: {
+    age: number[];
+    egfr: number[];
+    hba1c: number[];
+  };
+  cells: PopulationMapCell[];
+  generated_at: string;
+};
+
 export type RunArtifact = {
   schema_version: string;
   run_id: string;
@@ -104,6 +130,7 @@ export type RunArtifact = {
   final_recommendation: string;
   disclaimer: string;
   calibrations?: Record<string, { reasoning: string }>;
+  population_map?: PopulationMapArtifact;
 };
 
 export type ChatExplainResponse = {

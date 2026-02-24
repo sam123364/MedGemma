@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes_chat import router as chat_router
 from app.api.routes_runs import router as runs_router
 from app.db.sqlite import repository
+from app.graph.workflow import workflow_service
 from app.services import settings
 from app.services.medgemma import medgemma_client
 
@@ -28,7 +29,17 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup() -> None:
     repository.init_db()
+    if settings.ENFORCE_ALEMBIC_HEAD:
+        revision = repository.get_alembic_revision()
+        if revision != settings.ALEMBIC_HEAD_REVISION:
+            raise RuntimeError(
+                "Database schema is not at expected Alembic revision "
+                f"'{settings.ALEMBIC_HEAD_REVISION}'. Current revision: '{revision}'. "
+                "Run `make migrate` before starting the backend."
+            )
     await medgemma_client.warmup()
+    if settings.AUTO_RESUME_INCOMPLETE_RUNS:
+        workflow_service.auto_resume_incomplete_runs()
 
 
 app.include_router(runs_router)
@@ -43,4 +54,3 @@ async def health() -> dict:
         "medgemma_runtime": settings.MEDGEMMA_RUNTIME,
         "medgemma_model": settings.MEDGEMMA_MODEL,
     }
-

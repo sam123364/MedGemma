@@ -8,5 +8,7 @@ backend/data/
 backend/.env
 frontend/node_modules/
 frontend/.next/
+frontend/test-results/
+frontend/tsconfig.tsbuildinfo
 .DS_Store
 *.log

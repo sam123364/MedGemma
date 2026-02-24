@@ -31,6 +31,22 @@ async def create_run(
     return RunStartResponse(run_id=run_id, status="queued")
 
 
+@router.post("/runs/{run_id}/resume", response_model=RunStartResponse, status_code=status.HTTP_202_ACCEPTED)
+async def resume_run(run_id: str) -> RunStartResponse:
+    status_value = repository.get_run_status(run_id)
+    if status_value is None:
+        raise HTTPException(status_code=404, detail="run_id not found")
+    if workflow_service.run_is_active(run_id):
+        return RunStartResponse(run_id=run_id, status="running")
+
+    try:
+        workflow_service.resume_run(run_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    return RunStartResponse(run_id=run_id, status="running")
+
+
 @router.get("/runs/{run_id}/events")
 async def stream_events(run_id: str, last_event_id: int = Query(default=0, ge=0)) -> StreamingResponse:
     if repository.get_run_status(run_id) is None:
@@ -97,6 +113,29 @@ async def get_result(run_id: str) -> JSONResponse:
     return JSONResponse(status_code=200, content=artifact)
 
 
+@router.get("/runs/{run_id}/population-map")
+async def get_population_map(run_id: str) -> JSONResponse:
+    status_value = repository.get_run_status(run_id)
+    if status_value is None:
+        raise HTTPException(status_code=404, detail="run_id not found")
+
+    artifact = repository.get_run_result(run_id)
+    if artifact is None:
+        return JSONResponse(
+            status_code=202,
+            content={"schema_version": SCHEMA_VERSION, "run_id": run_id, "status": status_value},
+        )
+
+    population_map = artifact.get("population_map")
+    if not population_map:
+        return JSONResponse(
+            status_code=202,
+            content={"schema_version": SCHEMA_VERSION, "run_id": run_id, "status": status_value},
+        )
+
+    return JSONResponse(status_code=200, content=population_map)
+
+
 @router.get("/runs/{run_id}/status")
 async def get_status(run_id: str) -> JSONResponse:
     status_value = repository.get_run_status(run_id)
@@ -111,4 +150,3 @@ async def get_status(run_id: str) -> JSONResponse:
             "error": repository.get_run_error(run_id),
         }
     )
-

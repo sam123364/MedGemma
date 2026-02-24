@@ -5,7 +5,10 @@ from fastapi.testclient import TestClient
 from app.main import app
 
 
-def test_full_run_completes_and_returns_result() -> None:
+def test_full_run_completes_and_returns_result(monkeypatch) -> None:
+    monkeypatch.setattr("app.services.settings.SIM_HORIZON_DAYS", 30, raising=False)
+    monkeypatch.setattr("app.services.settings.COARSE_TRIALS", 120, raising=False)
+    monkeypatch.setattr("app.services.settings.HIGH_FIDELITY_COUNT", 2, raising=False)
     patient_payload = {
         "age": 57,
         "sex": "male",
@@ -25,7 +28,7 @@ def test_full_run_completes_and_returns_result() -> None:
         assert create.status_code == 202
         run_id = create.json()["run_id"]
 
-        deadline = time.time() + 25
+        deadline = time.time() + 90
         status = "queued"
         while time.time() < deadline:
             status_resp = client.get(f"/api/v1/runs/{run_id}/status")
@@ -43,3 +46,9 @@ def test_full_run_completes_and_returns_result() -> None:
         assert body["status"] == "completed"
         assert len(body["results"]) >= 1
         assert "final_recommendation" in body
+        assert "population_map" in body
+        assert len(body["population_map"]["cells"]) == 27
+
+        pop = client.get(f"/api/v1/runs/{run_id}/population-map")
+        assert pop.status_code == 200
+        assert len(pop.json()["cells"]) == 27

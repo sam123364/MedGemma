@@ -19,12 +19,19 @@ CHROMA_PATH = Path(os.getenv("ASTRA_CHROMA_PATH", str(DATA_DIR / "chroma")))
 MEDGEMMA_RUNTIME = os.getenv("MEDGEMMA_RUNTIME", "mock")
 MEDGEMMA_MODEL = os.getenv("MEDGEMMA_MODEL", "google/medgemma-27b-it")
 MEDGEMMA_MLX_ENDPOINT = os.getenv("MEDGEMMA_MLX_ENDPOINT", "http://127.0.0.1:8080/v1/chat/completions")
+MEDGEMMA_TIMEOUT_SECONDS = float(os.getenv("MEDGEMMA_TIMEOUT_SECONDS", "300"))
+MEDGEMMA_MAX_TOKENS = int(os.getenv("MEDGEMMA_MAX_TOKENS", "900"))
 MEDGEMMA_OLLAMA_URL = os.getenv("MEDGEMMA_OLLAMA_URL", "http://127.0.0.1:11434/api/generate")
 MEDGEMMA_OLLAMA_MODEL = os.getenv("MEDGEMMA_OLLAMA_MODEL", "medgemma")
 
 SIM_HORIZON_DAYS = int(os.getenv("SIM_HORIZON_DAYS", "180"))
 COARSE_TRIALS = int(os.getenv("COARSE_TRIALS", "1000"))
 HIGH_FIDELITY_COUNT = int(os.getenv("HIGH_FIDELITY_COUNT", "5"))
+POPULATION_MAP_TRIALS = int(os.getenv("POPULATION_MAP_TRIALS", "120"))
+
+AUTO_RESUME_INCOMPLETE_RUNS = os.getenv("AUTO_RESUME_INCOMPLETE_RUNS", "false").lower() == "true"
+ASTRA_FAIL_AFTER_NODE = os.getenv("ASTRA_FAIL_AFTER_NODE")
+ALEMBIC_HEAD_REVISION = os.getenv("ALEMBIC_HEAD_REVISION", "20260224_0001")
+ENFORCE_ALEMBIC_HEAD = os.getenv("ENFORCE_ALEMBIC_HEAD", "true").lower() == "true"
 
 CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
-

@@ -16,6 +16,7 @@ dependencies = [
   "numpy>=2.1.0",
   "chromadb>=1.0.0",
   "langgraph>=0.4.0",
+  "alembic>=1.14.0",
 ]
 
 [project.optional-dependencies]
@@ -27,6 +28,9 @@ dev = [
 [tool.pytest.ini_options]
 pythonpath = ["."]
 asyncio_mode = "auto"
+markers = [
+  "slow: marks slow-running performance tests",
+]
 
 [tool.setuptools.packages.find]
 include = ["app*"]

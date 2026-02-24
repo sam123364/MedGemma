@@ -130,8 +130,25 @@ class SQLiteRepository:
                   result_json TEXT NOT NULL,
                   FOREIGN KEY(run_id) REFERENCES runs(run_id)
                 );
+
+                CREATE TABLE IF NOT EXISTS run_checkpoints (
+                  id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  run_id TEXT NOT NULL,
+                  node_name TEXT NOT NULL,
+                  state_json TEXT NOT NULL,
+                  status TEXT NOT NULL,
+                  created_at TEXT NOT NULL,
+                  FOREIGN KEY(run_id) REFERENCES runs(run_id)
+                );
+
+                CREATE TABLE IF NOT EXISTS alembic_version (
+                  version_num TEXT NOT NULL
+                );
                 """
             )
+            revision_row = conn.execute("SELECT version_num FROM alembic_version LIMIT 1").fetchone()
+            if revision_row is None:
+                conn.execute("INSERT INTO alembic_version(version_num) VALUES (?)", (settings.ALEMBIC_HEAD_REVISION,))
 
     def create_run(self, run_id: str, model_runtime: str, disease_track: str = "type-2-diabetes") -> None:
         now = datetime.now(UTC).isoformat()
@@ -233,6 +250,55 @@ class SQLiteRepository:
             )
             return int(cursor.lastrowid)
 
+    def save_checkpoint(self, run_id: str, node_name: str, state_json: dict[str, Any], status: str = "saved") -> int:
+        now = datetime.now(UTC).isoformat()
+        with self._lock, self._conn() as conn:
+            cursor = conn.execute(
+                """
+                INSERT INTO run_checkpoints(run_id, node_name, state_json, status, created_at)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (run_id, node_name, json.dumps(state_json), status, now),
+            )
+            return int(cursor.lastrowid)
+
+    def get_latest_checkpoint(self, run_id: str) -> dict[str, Any] | None:
+        with self._lock, self._conn() as conn:
+            row = conn.execute(
+                """
+                SELECT id, run_id, node_name, state_json, status, created_at
+                FROM run_checkpoints
+                WHERE run_id = ?
+                ORDER BY id DESC
+                LIMIT 1
+                """,
+                (run_id,),
+            ).fetchone()
+        if not row:
+            return None
+        return {
+            "id": int(row["id"]),
+            "run_id": row["run_id"],
+            "node_name": row["node_name"],
+            "state_json": json.loads(row["state_json"]),
+            "status": row["status"],
+            "created_at": row["created_at"],
+        }
+
+    def mark_checkpoint_resumed(self, checkpoint_id: int) -> None:
+        with self._lock, self._conn() as conn:
+            conn.execute(
+                "UPDATE run_checkpoints SET status = ? WHERE id = ?",
+                ("resumed", checkpoint_id),
+            )
+
+    def get_incomplete_runs(self) -> list[str]:
+        with self._lock, self._conn() as conn:
+            rows = conn.execute(
+                "SELECT run_id FROM runs WHERE status IN ('queued', 'running', 'failed') ORDER BY created_at ASC"
+            ).fetchall()
+        return [str(row["run_id"]) for row in rows]
+
     def get_events_after(self, run_id: str, last_event_id: int) -> list[dict[str, Any]]:
         with self._lock, self._conn() as conn:
             rows = conn.execute(
@@ -278,6 +344,28 @@ class SQLiteRepository:
             return None
         return row["error_message"]
 
+    def get_patient(self, run_id: str) -> dict[str, Any] | None:
+        with self._lock, self._conn() as conn:
+            row = conn.execute("SELECT patient_json FROM patients WHERE run_id = ?", (run_id,)).fetchone()
+        if not row:
+            return None
+        return json.loads(row["patient_json"])
+
+    def get_alembic_revision(self) -> str | None:
+        with self._lock, self._conn() as conn:
+            row = conn.execute("SELECT version_num FROM alembic_version LIMIT 1").fetchone()
+        if not row:
+            return None
+        return str(row["version_num"])
+
+    def set_alembic_revision(self, revision: str) -> None:
+        with self._lock, self._conn() as conn:
+            exists = conn.execute("SELECT version_num FROM alembic_version LIMIT 1").fetchone()
+            if exists:
+                conn.execute("UPDATE alembic_version SET version_num = ?", (revision,))
+            else:
+                conn.execute("INSERT INTO alembic_version(version_num) VALUES (?)", (revision,))
+
     def save_chat_log(self, run_id: str, question: str, answer: str) -> None:
         now = datetime.now(UTC).isoformat()
         with self._lock, self._conn() as conn:
@@ -288,4 +376,3 @@ class SQLiteRepository:
 
 
 repository = SQLiteRepository(settings.DB_PATH)
-
