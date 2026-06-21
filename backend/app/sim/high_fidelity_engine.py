@@ -120,15 +120,15 @@ async def simulate_high_fidelity(
 
         events: list[str] = []
         severe = False
-        if glucose < 70:
+        if glucose < 60:
             events.append("hypoglycemia_signal")
-            severe = severe or glucose < 62
-        if alt > 120:
+            severe = severe or glucose < 50
+        if alt > 150:
             events.append("liver_stress_signal")
-            severe = severe or alt > 160
-        if risk > 0.20 and rng.random() < risk * 0.25:
+            severe = severe or alt > 200
+        if risk > 0.35 and rng.random() < risk * 0.15:
             events.append("treatment_toxicity_signal")
-            severe = severe or risk > 0.28
+            severe = severe or risk > 0.45
 
         trajectory.append(
             DailyState(
