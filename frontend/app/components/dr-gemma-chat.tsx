@@ -50,6 +50,25 @@ export function DrGemmaChat({ runId }: Props) {
     }
   };
 
+  const submitPrompt = async (text: string) => {
+    if (pending) return;
+    setMessages((prev) => [...prev, { role: "user", text }]);
+    setPending(true);
+    setError(null);
+
+    try {
+      const response = await explainRun(runId, text);
+      const suffix = response.grounded_source_ids.length
+        ? `\n\nGrounded sources: ${response.grounded_source_ids.join(", ")}`
+        : "";
+      setMessages((prev) => [...prev, { role: "assistant", text: `${response.answer}${suffix}` }]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Chat request failed");
+    } finally {
+      setPending(false);
+    }
+  };
+
   return (
     <>
       {/* Floating Action Button */}
@@ -91,6 +110,19 @@ export function DrGemmaChat({ runId }: Props) {
           </div>
 
           {error ? <p className="chat-error">{error}</p> : null}
+
+          {/* Quick Prompts Container */}
+          <div className="chat-presets" style={{ display: "flex", flexWrap: "wrap", gap: "0.35rem", padding: "0.5rem 1rem", background: "#f8fafc", borderTop: "1px solid var(--border)" }}>
+            <button type="button" onClick={() => submitPrompt("Why was the top recommendation selected?")} style={{ background: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "14px", padding: "0.25rem 0.5rem", fontSize: "0.72rem", cursor: "pointer", color: "var(--fg-1)", fontWeight: 500 }}>
+              Why #1?
+            </button>
+            <button type="button" onClick={() => submitPrompt("What are the key safety considerations for this twin?")} style={{ background: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "14px", padding: "0.25rem 0.5rem", fontSize: "0.72rem", cursor: "pointer", color: "var(--fg-1)", fontWeight: 500 }}>
+              Safety Check
+            </button>
+            <button type="button" onClick={() => submitPrompt("Is there any risk of Metformin lactic acidosis here?")} style={{ background: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "14px", padding: "0.25rem 0.5rem", fontSize: "0.72rem", cursor: "pointer", color: "var(--fg-1)", fontWeight: 500 }}>
+              Renal Risks
+            </button>
+          </div>
 
           <form onSubmit={submit} className="chat-form">
             <input
