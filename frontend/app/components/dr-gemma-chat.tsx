@@ -14,6 +14,7 @@ type Message = {
 };
 
 export function DrGemmaChat({ runId }: Props) {
+  const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -50,34 +51,60 @@ export function DrGemmaChat({ runId }: Props) {
   };
 
   return (
-    <section className="chat-shell">
-      <div className="chat-head">
-        <h3>Dr. MedGemma Explainability Console</h3>
-        <p>Grounded in run artifacts only.</p>
-      </div>
+    <>
+      {/* Floating Action Button */}
+      <button 
+        className="chat-toggle-btn"
+        onClick={() => setIsOpen(!isOpen)}
+        aria-label="Toggle chat assistant"
+      >
+        {isOpen ? (
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        ) : (
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+        )}
+      </button>
 
-      <div className="chat-log" role="log" aria-live="polite">
-        {messages.map((message, index) => (
-          <article key={`${message.role}-${index}`} className={`chat-bubble ${message.role}`}>
-            <span>{message.role === "assistant" ? "Dr. Gemma" : "You"}</span>
-            <p>{message.text}</p>
-          </article>
-        ))}
-      </div>
+      {/* Floating Chat Panel */}
+      {isOpen && (
+        <section className="chat-overlay-panel">
+          <div className="chat-overlay-head">
+            <div>
+              <h3>Dr. MedGemma</h3>
+              <p>Explainability Console</p>
+            </div>
+            <button className="chat-close-btn" onClick={() => setIsOpen(false)}>×</button>
+          </div>
 
-      {error ? <p className="chat-error">{error}</p> : null}
+          <div className="chat-log" role="log" aria-live="polite">
+            {messages.map((message, index) => (
+              <article key={`${message.role}-${index}`} className={`chat-bubble ${message.role}`}>
+                <span>{message.role === "assistant" ? "Dr. Gemma" : "You"}</span>
+                <p>{message.text}</p>
+              </article>
+            ))}
+          </div>
 
-      <form onSubmit={submit} className="chat-form">
-        <input
-          value={question}
-          onChange={(event) => setQuestion(event.target.value)}
-          placeholder="Why is protocol #1 safer than #2?"
-          disabled={pending}
-        />
-        <button type="submit" disabled={pending}>
-          {pending ? "Thinking..." : "Ask"}
-        </button>
-      </form>
-    </section>
+          {error ? <p className="chat-error">{error}</p> : null}
+
+          <form onSubmit={submit} className="chat-form">
+            <input
+              value={question}
+              onChange={(event) => setQuestion(event.target.value)}
+              placeholder="Why is protocol #1 safer than #2?"
+              disabled={pending}
+            />
+            <button type="submit" disabled={pending}>
+              {pending ? "..." : "Ask"}
+            </button>
+          </form>
+        </section>
+      )}
+    </>
   );
 }

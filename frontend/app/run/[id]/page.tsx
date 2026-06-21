@@ -164,9 +164,8 @@ export default function RunPage() {
 
       {error ? <p className="error-banner">{error}</p> : null}
 
-      <div className="run-grid">
+      <div className="run-grid-full">
         <LiveTrialChart results={result?.results ?? []} />
-        <WorkflowTimeline events={events} />
       </div>
 
       <BlackBoxWarning warnings={warnings} />

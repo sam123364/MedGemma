@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
+from typing import AsyncIterator
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -11,23 +14,8 @@ from app.services import settings
 from app.services.medgemma import medgemma_client
 
 
-app = FastAPI(
-    title="Astra-Gemma API",
-    version="0.1.0",
-    description="Agentic in-silico trial engine for synthetic Type 2 Diabetes personalization.",
-)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
-@app.on_event("startup")
-async def startup() -> None:
+@asynccontextmanager
+async def lifespan(application: FastAPI) -> AsyncIterator[None]:  # noqa: ARG001
     repository.init_db()
     if settings.ENFORCE_ALEMBIC_HEAD:
         revision = repository.get_alembic_revision()
@@ -40,6 +28,23 @@ async def startup() -> None:
     await medgemma_client.warmup()
     if settings.AUTO_RESUME_INCOMPLETE_RUNS:
         workflow_service.auto_resume_incomplete_runs()
+    yield
+
+
+app = FastAPI(
+    title="Astra-Gemma API",
+    version="0.1.0",
+    description="Agentic in-silico trial engine for synthetic Type 2 Diabetes personalization.",
+    lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 app.include_router(runs_router)

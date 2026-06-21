@@ -100,9 +100,10 @@ class MedGemmaClient:
         return MedGemmaResponse(text=text, raw=data)
 
     def _complete_mock(self, prompt: str) -> MedGemmaResponse:
+        prompt_lower = prompt.lower()
         if "READY" in prompt:
             return MedGemmaResponse(text="READY")
-        if "JSON" in prompt.upper() and "protocols" in prompt.lower():
+        if "json" in prompt_lower and "protocols" in prompt_lower:
             mock_payload = {
                 "protocols": [
                     {
@@ -116,7 +117,7 @@ class MedGemmaClient:
                 ]
             }
             return MedGemmaResponse(text=json.dumps(mock_payload))
-        if "coefficient" in prompt.lower():
+        if "coefficient" in prompt_lower or "calibrat" in prompt_lower:
             return MedGemmaResponse(
                 text=json.dumps(
                     {
@@ -127,11 +128,26 @@ class MedGemmaClient:
                     }
                 )
             )
-        if "answer the question" in prompt.lower():
+        if "top-ranked" in prompt_lower or "top candidates" in prompt_lower or "explain the top" in prompt_lower:
             return MedGemmaResponse(
-                text="Based on run artifacts, protocol #1 balances HbA1c reduction and safety better than alternatives."
+                text=(
+                    "The top-ranked protocol achieves the strongest balance of glycemic efficacy and safety "
+                    "profile in this simulation. It combines complementary mechanisms that address the "
+                    "patient's baseline HbA1c while keeping safety risk within acceptable bounds. "
+                    "Safety and efficacy signals together place it above alternatives in the weighted ranking."
+                )
             )
-        return MedGemmaResponse(text="MedGemma mock response.")
+        if "astra-gemma" in prompt_lower or "run artifact" in prompt_lower or "answer" in prompt_lower:
+            return MedGemmaResponse(
+                text=(
+                    "Based on the run artifacts, the top protocol achieves superior HbA1c reduction with "
+                    "a lower predicted adverse event burden compared to the alternatives. "
+                    "The safety risk index is meaningfully lower, and the robustness index reflects "
+                    "more consistent outcomes across simulated trials. "
+                    "The second-ranked protocol offers comparable efficacy but carries a higher safety penalty."
+                )
+            )
+        return MedGemmaResponse(text="MedGemma mock response: simulation complete.")
 
     @staticmethod
     def _extract_json(text: str) -> dict[str, Any] | list[Any] | None:

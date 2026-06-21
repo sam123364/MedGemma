@@ -3,7 +3,18 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field, conlist
+from pydantic import BaseModel, Field
+from pydantic.functional_validators import AfterValidator
+from typing import Annotated
+
+
+def _min_len_2(v: list) -> list:
+    if len(v) < 2:
+        raise ValueError('List must have at least 2 items')
+    return v
+
+
+MinLen2StrList = Annotated[list[str], AfterValidator(_min_len_2)]
 
 
 SCHEMA_VERSION = "1.0.0"
@@ -45,11 +56,11 @@ class PatientTwinInput(SchemaVersioned):
 class ProtocolCandidate(SchemaVersioned):
     protocol_id: str
     label: str
-    meds: conlist(str, min_length=1)
+    meds: list[str] = Field(min_length=1)
     lifestyle_plan: str
     rationale: str
-    citations: conlist(str, min_length=2)
-    citation_source_ids: conlist(str, min_length=2)
+    citations: MinLen2StrList
+    citation_source_ids: MinLen2StrList
 
 
 class CoarseSummary(SchemaVersioned):

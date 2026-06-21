@@ -27,11 +27,11 @@ export default function HomePage() {
   return (
     <main className="home-root">
       <section className="hero">
-        <p className="eyebrow">Astra-Gemma</p>
-        <h1>Autonomous In-Silico Trial Engine</h1>
+        <p className="eyebrow">Clinical Research Sandbox</p>
+        <h1>Astra-Gemma In-Silico Simulator</h1>
         <p>
-          Build a synthetic patient twin, launch 1,000 coarse trial trajectories, and watch MedGemma-driven
-          protocol intelligence rank personalized treatment options live.
+          Designed for clinical researchers and medical educators. Build a synthetic patient profile below to simulate, 
+          rank, and analyze the 180-day efficacy and safety of custom Type 2 Diabetes treatment protocols.
         </p>
       </section>
 
@@ -40,10 +40,11 @@ export default function HomePage() {
       {error ? <p className="error-banner">{error}</p> : null}
 
       <aside className="compliance-note">
-        <h3>Safety & Compliance</h3>
+        <h3>Research Sandbox Scope</h3>
         <p>
-          Research prototype only. Synthetic profiles only. Outputs are not medical advice and must not be used for
-          clinical decision-making.
+          This is an educational prototype exploring AI-driven medical simulation. It utilizes synthetic patient twins 
+          and mock data endpoints to evaluate therapeutic logic. All simulation insights and recommendations are for 
+          research purposes and do not represent clinical medical advice.
         </p>
       </aside>
     </main>

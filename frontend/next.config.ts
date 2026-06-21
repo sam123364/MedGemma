@@ -4,9 +4,13 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  allowedDevOrigins: ["http://localhost:3000", "http://127.0.0.1:3000"],
-  turbopack: {
-    root: path.resolve(__dirname),
+  turbopack: {},
+  webpack(config) {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      "@": path.resolve(__dirname, "app"),
+    };
+    return config;
   },
 };
 
