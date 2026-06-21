@@ -81,15 +81,15 @@ export function PatientSheet({ onRun, isRunning }: Props) {
         fasting_glucose: 188,
         systolic_bp: 138,
         diastolic_bp: 82,
-        egfr: 28.5,
+        egfr: 42.0,
         alt: 31,
         adherence_probability: 0.78,
         comorbidities: ["hypertension", "chronic-kidney-disease"],
-        meds_current: ["metformin"],
+        meds_current: ["insulin glargine"],
         objective: "Manage glycemic control while strictly respecting renal dose adjustments/contraindications",
       });
       setComorbidText("hypertension, chronic-kidney-disease");
-      setMedsText("metformin");
+      setMedsText("insulin glargine");
     }
   };
 
