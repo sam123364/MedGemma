@@ -9,7 +9,9 @@ type Props = {
 const palette = ["#22d3ee", "#7dd3fc", "#34d399", "#fbbf24", "#fb7185", "#a3e635"];
 
 export function LiveTrialChart({ results }: Props) {
-  const selected = results.slice(0, 5);
+  // Try to first show allowed protocols, otherwise show blocked ones so the user sees the trajectories
+  const nonBlocked = results.filter(r => !r.score.disqualified);
+  const selected = nonBlocked.length > 0 ? nonBlocked.slice(0, 5) : results.slice(0, 5);
 
   if (selected.length === 0) {
     return (
