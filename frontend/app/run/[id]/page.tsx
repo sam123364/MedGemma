@@ -149,13 +149,47 @@ export default function RunPage() {
   );
   const warnings = resultWarnings.length > 0 ? resultWarnings : eventWarnings;
 
+  const progressPercentage = useMemo(() => {
+    switch (statusText) {
+      case "init_run":
+      case "run.started":
+        return 10;
+      case "retrieve_evidence":
+        return 30;
+      case "generate_protocols":
+      case "protocols.generated":
+        return 50;
+      case "run_simulation":
+      case "coarse.progress":
+      case "highfidelity.progress":
+        return 70;
+      case "evaluate_safety":
+        return 85;
+      case "score_and_rank":
+      case "critic.done":
+        return 95;
+      case "Run completed":
+      case "completed":
+        return 100;
+      default:
+        return 5;
+    }
+  }, [statusText]);
+
   return (
     <main className="run-root">
       <header className="run-header">
         <div>
           <p className="eyebrow">Run ID</p>
           <h1>{runId}</h1>
-          <p className="status-pill">Workflow Status: {statusText}</p>
+          <div style={{ display: "flex", gap: "1rem", alignItems: "center", marginTop: "0.4rem" }}>
+            <p className="status-pill">Workflow Status: {statusText}</p>
+            {progressPercentage < 100 && (
+              <div style={{ width: "160px", height: "8px", background: "#e2e8f0", borderRadius: "99px", overflow: "hidden", position: "relative" }}>
+                <div style={{ width: `${progressPercentage}%`, height: "100%", background: "var(--accent-a)", transition: "width 0.4s ease" }} />
+              </div>
+            )}
+          </div>
         </div>
         <Link className="ghost-link" href="/">
           New patient run
