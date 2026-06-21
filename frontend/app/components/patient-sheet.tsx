@@ -35,6 +35,64 @@ export function PatientSheet({ onRun, isRunning }: Props) {
     return Math.max(0, Math.min(100, Math.round(riskPressure)));
   }, [patient]);
 
+  const setPreset = (type: "controlled" | "severe_uncontrolled" | "renal_impaired") => {
+    if (type === "controlled") {
+      setPatient({
+        age: 52,
+        sex: "female",
+        bmi: 27.5,
+        hba1c: 7.2,
+        fasting_glucose: 145,
+        systolic_bp: 130,
+        diastolic_bp: 80,
+        egfr: 92,
+        alt: 28,
+        adherence_probability: 0.85,
+        comorbidities: ["hypertension"],
+        meds_current: ["metformin"],
+        objective: "Maintain glycemic control, avoid cardiovascular risk",
+      });
+      setComorbidText("hypertension");
+      setMedsText("metformin");
+    } else if (type === "severe_uncontrolled") {
+      setPatient({
+        age: 61,
+        sex: "male",
+        bmi: 34.2,
+        hba1c: 9.8,
+        fasting_glucose: 242,
+        systolic_bp: 148,
+        diastolic_bp: 92,
+        egfr: 72,
+        alt: 42,
+        adherence_probability: 0.65,
+        comorbidities: ["hypertension", "dyslipidemia", "obesity"],
+        meds_current: ["metformin", "glimepiride"],
+        objective: "Aggressively reduce HbA1c, minimize hypoglycemia risk, encourage weight loss",
+      });
+      setComorbidText("hypertension, dyslipidemia, obesity");
+      setMedsText("metformin, glimepiride");
+    } else if (type === "renal_impaired") {
+      setPatient({
+        age: 68,
+        sex: "female",
+        bmi: 29.8,
+        hba1c: 8.5,
+        fasting_glucose: 188,
+        systolic_bp: 138,
+        diastolic_bp: 82,
+        egfr: 28.5,
+        alt: 31,
+        adherence_probability: 0.78,
+        comorbidities: ["hypertension", "chronic-kidney-disease"],
+        meds_current: ["metformin"],
+        objective: "Manage glycemic control while strictly respecting renal dose adjustments/contraindications",
+      });
+      setComorbidText("hypertension, chronic-kidney-disease");
+      setMedsText("metformin");
+    }
+  };
+
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     const clean = {
@@ -64,9 +122,23 @@ export function PatientSheet({ onRun, isRunning }: Props) {
         </div>
       </div>
 
+      {/* Preset Profiles Picker */}
+      <div className="preset-bar" style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem" }}>
+        <span style={{ fontSize: "0.85rem", alignSelf: "center", color: "var(--muted)", marginRight: "0.5rem", fontWeight: 500 }}>Presets:</span>
+        <button type="button" className="preset-btn" onClick={() => setPreset("controlled")} style={{ background: "#f1f5f9", border: "1px solid #cbd5e1", borderRadius: "6px", padding: "0.35rem 0.65rem", fontSize: "0.78rem", cursor: "pointer", fontWeight: 500 }}>
+          Controlled Twin
+        </button>
+        <button type="button" className="preset-btn" onClick={() => setPreset("severe_uncontrolled")} style={{ background: "#f1f5f9", border: "1px solid #cbd5e1", borderRadius: "6px", padding: "0.35rem 0.65rem", fontSize: "0.78rem", cursor: "pointer", fontWeight: 500 }}>
+          Severe Uncontrolled Twin
+        </button>
+        <button type="button" className="preset-btn" onClick={() => setPreset("renal_impaired")} style={{ background: "#f1f5f9", border: "1px solid #cbd5e1", borderRadius: "6px", padding: "0.35rem 0.65rem", fontSize: "0.78rem", cursor: "pointer", fontWeight: 500 }}>
+          CKD Renal Impaired Twin
+        </button>
+      </div>
+
       <div className="sheet-grid">
         <label>
-          Age
+          Age (years)
           <input
             type="number"
             value={patient.age}
@@ -85,7 +157,7 @@ export function PatientSheet({ onRun, isRunning }: Props) {
           </select>
         </label>
         <label>
-          BMI
+          BMI (kg/m²)
           <input
             type="number"
             step="0.1"
@@ -94,7 +166,7 @@ export function PatientSheet({ onRun, isRunning }: Props) {
           />
         </label>
         <label>
-          HbA1c
+          HbA1c (%)
           <input
             type="number"
             step="0.1"
@@ -103,7 +175,7 @@ export function PatientSheet({ onRun, isRunning }: Props) {
           />
         </label>
         <label>
-          Fasting Glucose
+          Fasting Glucose (mg/dL)
           <input
             type="number"
             value={patient.fasting_glucose}
@@ -111,7 +183,7 @@ export function PatientSheet({ onRun, isRunning }: Props) {
           />
         </label>
         <label>
-          Systolic BP
+          Systolic BP (mmHg)
           <input
             type="number"
             value={patient.systolic_bp}
@@ -119,7 +191,7 @@ export function PatientSheet({ onRun, isRunning }: Props) {
           />
         </label>
         <label>
-          Diastolic BP
+          Diastolic BP (mmHg)
           <input
             type="number"
             value={patient.diastolic_bp}
@@ -127,7 +199,7 @@ export function PatientSheet({ onRun, isRunning }: Props) {
           />
         </label>
         <label>
-          eGFR
+          eGFR (mL/min/1.73m²)
           <input
             type="number"
             step="0.1"
@@ -136,7 +208,7 @@ export function PatientSheet({ onRun, isRunning }: Props) {
           />
         </label>
         <label>
-          ALT
+          ALT (U/L)
           <input
             type="number"
             step="0.1"
@@ -145,10 +217,12 @@ export function PatientSheet({ onRun, isRunning }: Props) {
           />
         </label>
         <label>
-          Adherence Probability
+          Adherence Prob. (0 - 1)
           <input
             type="number"
             step="0.01"
+            min="0"
+            max="1"
             value={patient.adherence_probability}
             onChange={(event) =>
               setPatient((prev) => ({
@@ -162,19 +236,19 @@ export function PatientSheet({ onRun, isRunning }: Props) {
 
       <div className="sheet-stack">
         <label>
-          Comorbidities (comma separated)
+          Comorbidities (comma separated list, e.g. hypertension, dyslipidemia)
           <input value={comorbidText} onChange={(event) => setComorbidText(event.target.value)} />
         </label>
         <label>
-          Current Medications (comma separated)
+          Current Medications (comma separated list, e.g. metformin)
           <input value={medsText} onChange={(event) => setMedsText(event.target.value)} />
         </label>
         <label>
-          Optimization Objective
+          Optimization Objective / Goals
           <textarea
             value={patient.objective}
             onChange={(event) => setPatient((prev) => ({ ...prev, objective: event.target.value }))}
-            rows={3}
+            rows={2}
           />
         </label>
       </div>
